@@ -19,6 +19,8 @@ const envSchema = z.object({
   MAILTRAP_SMTP_PORT: z.string(),
   MAILTRAP_SMTP_USERNAME: z.string(),
   MAILTRAP_SMTP_PASSWORD: z.string(),
+  VERIFICATION_EMAIL_URL: z.string(),
+  CREATED_POST_EMAIL_URL: z.string(),
   FORGOT_PASSWORD_REDIRECT_URL: z.string(),
 });
 
