@@ -2,11 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import { ZodType, ZodRawShape } from "zod";
 import ApiError from "../utils/ApiError";
 interface Schema {
-  headers?: ZodType<ZodRawShape>;
-  body?: ZodType<ZodRawShape>;
-  cookies?: ZodType<ZodRawShape>;
-  params?: ZodType<ZodRawShape>;
-  query?: ZodType<ZodRawShape>;
+  headers?: ZodType<any>;
+  body?: ZodType<any>;
+  cookies?: ZodType<any>;
+  params?: ZodType<any>;
+  query?: ZodType<any>;
 }
 const validateReq = (schema: Schema) => {
   return (req: Request, res: Response, next: NextFunction) => {
