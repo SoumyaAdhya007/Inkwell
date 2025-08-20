@@ -2,7 +2,7 @@ import { Router } from "express";
 import validateReq from "../../middlewares/validationRequest.middlewares";
 
 import authCheck from "../../middlewares/auth.middlewares";
-import adminCheck from "../../middlewares/admin.middleware";
+import adminCheck from "../../middlewares/admin.middlewares";
 import apiKeyCheck from "../../middlewares/apiKey.middlewares";
 import {
   approvePostByIdValidator,

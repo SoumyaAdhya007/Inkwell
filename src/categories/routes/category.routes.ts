@@ -14,7 +14,7 @@ import {
   updateCategoryById,
 } from "../controllers/category.controllers";
 import authCheck from "../../middlewares/auth.middlewares";
-import adminCheck from "../../middlewares/admin.middleware";
+import adminCheck from "../../middlewares/admin.middlewares";
 import apiKeyCheck from "../../middlewares/apiKey.middlewares";
 
 const router = Router();
