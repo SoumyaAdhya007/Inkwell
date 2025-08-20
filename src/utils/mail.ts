@@ -6,18 +6,20 @@ import env from "../config/env.config";
  * This ensures all email generation functions produce a consistent data structure.
  */
 interface EmailBodyContent {
-  name: string;
-  intro: string | string[];
-  action?: {
-    instructions: string;
-    button: {
-      color: string;
-      text: string;
-      link: string;
+  body: {
+    name: string;
+    intro: string | string[];
+    action?: {
+      instructions: string;
+      button: {
+        color: string;
+        text: string;
+        link: string;
+      };
     };
+    outro?: string | string[];
+    signature?: string;
   };
-  outro?: string | string[];
-  signature?: string;
 }
 
 const sendMail = async (email: string, subject: string, emailContent: any) => {
@@ -67,19 +69,22 @@ const generateVerificationEmail = (
   verificationLink: string
 ): EmailBodyContent => {
   return {
-    name: username,
-    intro: "Welcome to our platform! We're very excited to have you on board.",
-    action: {
-      instructions:
-        "To get started, please click the button below to confirm your account:",
-      button: {
-        color: "#22BC66",
-        text: "Confirm your account",
-        link: verificationLink,
+    body: {
+      name: username,
+      intro:
+        "Welcome to our platform! We're very excited to have you on board.",
+      action: {
+        instructions:
+          "To get started, please click the button below to confirm your account:",
+        button: {
+          color: "#22BC66",
+          text: "Confirm your account",
+          link: verificationLink,
+        },
       },
+      outro:
+        "Need help, or have questions? Just reply to this email, we'd love to help.",
     },
-    outro:
-      "Need help, or have questions? Just reply to this email, we'd love to help.",
   };
 };
 
@@ -94,19 +99,21 @@ const generateForgotPasswordEmail = (
   resetLink: string
 ): EmailBodyContent => {
   return {
-    name: username,
-    intro:
-      "We received a request to reset your password. If you didn't make this request, you can ignore this email.",
-    action: {
-      instructions: "To reset your password, click the button below:",
-      button: {
-        color: "#FF5733",
-        text: "Reset Password",
-        link: resetLink,
+    body: {
+      name: username,
+      intro:
+        "We received a request to reset your password. If you didn't make this request, you can ignore this email.",
+      action: {
+        instructions: "To reset your password, click the button below:",
+        button: {
+          color: "#FF5733",
+          text: "Reset Password",
+          link: resetLink,
+        },
       },
+      outro:
+        "If you did not request a password reset, no further action is required.",
     },
-    outro:
-      "If you did not request a password reset, no further action is required.",
   };
 };
 
@@ -117,23 +124,26 @@ const generateForgotPasswordEmail = (
  * @param viewLink The link to view the blog post in a draft or preview state.
  * @returns The structured email body content.
  */
-const generateBlogCreatedEmail = (
+const generatePostCreatedEmail = (
   username: string,
   blogTitle: string,
   viewLink: string
 ): EmailBodyContent => {
   return {
-    name: username,
-    intro: `Great news! Your blog post, "${blogTitle}", has been successfully created and is now awaiting review.`,
-    action: {
-      instructions: "You can view your post by clicking the button below:",
-      button: {
-        color: "#4a90e2",
-        text: "View Your Post",
-        link: viewLink,
+    body: {
+      name: username,
+      intro: `Great news! Your blog post, "${blogTitle}", has been successfully created and is now awaiting review.`,
+      action: {
+        instructions: "You can view your post by clicking the button below:",
+        button: {
+          color: "#4a90e2",
+          text: "View Your Post",
+          link: viewLink,
+        },
       },
+      outro:
+        "We will notify you as soon as your blog is reviewed and published!",
     },
-    outro: "We will notify you as soon as your blog is reviewed and published!",
   };
 };
 
@@ -144,23 +154,38 @@ const generateBlogCreatedEmail = (
  * @param publishLink The link to the live, published blog post.
  * @returns The structured email body content.
  */
-const generateBlogAcceptedEmail = (
+const generatePostAcceptedEmail = (
   username: string,
   blogTitle: string,
   publishLink: string
 ): EmailBodyContent => {
   return {
-    name: username,
-    intro: `Congratulations, ${username}! Your blog post, "${blogTitle}", has been accepted and is now live on the site.`,
-    action: {
-      instructions: "Check out your published post here:",
-      button: {
-        color: "#1a73e8",
-        text: "View Published Post",
-        link: publishLink,
+    body: {
+      name: username,
+      intro: `Congratulations, ${username}! Your blog post, "${blogTitle}", has been accepted and is now live on the site.`,
+      action: {
+        instructions: "Check out your published post here:",
+        button: {
+          color: "#1a73e8",
+          text: "View Published Post",
+          link: publishLink,
+        },
       },
+      outro: "Thanks for sharing your awesome content with us!",
     },
-    outro: "Thanks for sharing your awesome content with us!",
+  };
+};
+const generatePostRejectedEmail = (
+  username: string,
+  blogTitle: string
+): EmailBodyContent => {
+  return {
+    body: {
+      name: username,
+      intro: `Hello ${username}, unfortunately, your blog post "${blogTitle}" has been rejected by our review team.`,
+      outro:
+        "You cannot update this post, but you’re welcome to write and submit a new blog for review. We appreciate your contribution!",
+    },
   };
 };
 
@@ -168,6 +193,7 @@ export {
   sendMail,
   generateVerificationEmail,
   generateForgotPasswordEmail,
-  generateBlogCreatedEmail,
-  generateBlogAcceptedEmail,
+  generatePostCreatedEmail,
+  generatePostAcceptedEmail,
+  generatePostRejectedEmail,
 };
