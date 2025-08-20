@@ -5,6 +5,7 @@ import AdminRouter from "../admin/routes/admin.routes";
 import AuthRouter from "../auth/routes/auth.routes";
 import CategoriesRouter from "../categories/routes/category.routes";
 import PostsRouter from "../posts/routes/post.routes";
+import HealthCheckRouter from "../healthCheck/routes/healthCheck.routes";
 function app(): Express {
   const app: Express = express();
 
@@ -16,6 +17,7 @@ function app(): Express {
   app.use("/api/v1/auth", AuthRouter);
   app.use("/api/v1/categories", CategoriesRouter);
   app.use("/api/v1/posts", PostsRouter);
+  app.use("/api/v1/healthcheck", HealthCheckRouter);
   app.use(errorMiddleware);
   return app;
 }
