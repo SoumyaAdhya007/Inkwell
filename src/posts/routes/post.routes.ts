@@ -17,12 +17,14 @@ import {
 } from "../controllers/post.controllers";
 import authCheck from "../../middlewares/auth.middlewares";
 import apiKeyCheck from "../../middlewares/apiKey.middlewares";
+import { apiKeyLimiter, globalLimiter } from "../../utils/rateLimiter";
 const router = Router();
-router.route("/").get(getAllPosts);
+
+router.route("/").get(globalLimiter, getAllPosts);
 router
   .route("/:userId/:id")
   .get(validateReq(getUserPostByIdValidator), getUserPostById);
-router.use(authCheck,apiKeyCheck);
+router.use(authCheck, apiKeyCheck, apiKeyLimiter);
 router.route("/").post(validateReq(createPostValidator), createPost);
 
 router.route("/:id").get(validateReq(getPostByIdValidator), getPostById);
