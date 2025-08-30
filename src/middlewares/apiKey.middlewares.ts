@@ -43,6 +43,9 @@ const apiKeyCheck = asyncHandler(
     if (!key) {
       throw new ApiError(401, "Unauthorized - Invalid API Key or expired");
     }
+
+    req.apiKey = key.key;
+
     if (key.useCount >= key.limit) {
       throw new ApiError(401, "Unauthorized - API Key reached its limit");
     }
