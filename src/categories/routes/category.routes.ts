@@ -16,21 +16,18 @@ import {
 import authCheck from "../../middlewares/auth.middlewares";
 import adminCheck from "../../middlewares/admin.middlewares";
 import apiKeyCheck from "../../middlewares/apiKey.middlewares";
+import { apiKeyLimiter } from "../../utils/rateLimiter";
 
 const router = Router();
 
-router.route("/").get(authCheck, apiKeyCheck, getAllCategories);
+router.use(authCheck, apiKeyCheck, apiKeyLimiter);
+router.route("/").get(getAllCategories);
 
 router
   .route("/:id")
-  .get(
-    authCheck,
-    apiKeyCheck,
-    validateReq(getCategoryByIdValidator),
-    getCategoryById
-  );
+  .get(validateReq(getCategoryByIdValidator), getCategoryById);
 
-router.use(authCheck, adminCheck, apiKeyCheck);
+router.use(authCheck, adminCheck, apiKeyCheck, apiKeyLimiter);
 router.route("/").post(validateReq(createCategoryValidator), createCategory);
 
 router
