@@ -71,7 +71,7 @@ const login = asyncHandler(async (req: Request, res: Response) => {
   const accessToken = user?.generateAccessToken();
   const refreshToken = user?.generateRefreshToken();
   user.refreshToken = refreshToken;
-  user.refreshTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  user.refreshTokenExpiry = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000);
   res
     .cookie("accessToken", accessToken, cookieOption(24 * 60 * 60 * 1000))
     .cookie(
@@ -104,9 +104,58 @@ const createApiKey = asyncHandler(async (req: Request, res: Response) => {
     .json(new ApiResponse(201, "New Api Key Generated.", newApiKey));
 });
 
+const refreshAccessToken = asyncHandler(async (req: Request, res: Response) => {
+  const refreshToken = req.cookies.refreshToken;
+  const decode = jwt.verify(refreshToken, env.REFRESH_TOKEN_SECRET) as {
+    id: string;
+  };
+
+  if (!decode) {
+    throw new ApiError(401, "Unauthorized - Invalid refresh token.");
+  }
+
+  const user = await User.findById(decode.id);
+
+  if (!user) {
+    throw new ApiError(401, "Unauthorized - Invalid refresh token.");
+  }
+  if (
+    user.refreshToken !== refreshToken ||
+    !user.refreshTokenExpiry ||
+    user.refreshTokenExpiry.getTime() < Date.now()
+  ) {
+    throw new ApiError(401, "Unauthorized - Invalid or expired refresh token");
+  }
+  const newAccessToken = user?.generateAccessToken();
+  const newRefreshToken = user?.generateRefreshToken();
+  user.refreshToken = newRefreshToken;
+  user.refreshTokenExpiry = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000);
+  await user.save();
+  res
+    .cookie("accessToken", newAccessToken, cookieOption(24 * 60 * 60 * 1000))
+    .cookie(
+      "refreshToken",
+      newRefreshToken,
+      cookieOption(10 * 24 * 60 * 60 * 1000)
+    )
+    .json(
+      new ApiResponse(200, "Access Token Generated Successfully", {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      })
+    );
+});
+
 const getMe = asyncHandler(async (req: Request, res: Response) => {
   const user = req.user;
   res.status(200).json(new ApiResponse(200, "User details fetched.", user));
 });
 
-export { register, verifyEmail, login, createApiKey, getMe };
+export {
+  register,
+  verifyEmail,
+  login,
+  createApiKey,
+  refreshAccessToken,
+  getMe,
+};
