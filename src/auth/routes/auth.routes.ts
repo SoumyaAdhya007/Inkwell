@@ -4,6 +4,7 @@ import {
   createApiKey,
   getMe,
   login,
+  refreshAccessToken,
   register,
   verifyEmail,
 } from "../controllers/auth.controllers";
@@ -25,6 +26,8 @@ router
 router.route("/login").post(loginLimiter, validateReq(loginValidator), login);
 
 router.route("/api-key").get(authCheck, createApiKey);
+
+router.route("/refresh-token").get(refreshAccessToken);
 
 router.use(authCheck, apiKeyCheck, apiKeyLimiter);
 
