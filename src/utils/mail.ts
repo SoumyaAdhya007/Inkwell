@@ -9,6 +9,7 @@ interface EmailBodyContent {
   body: {
     name: string;
     intro: string | string[];
+    dictionary?: {};
     action?: {
       instructions: string;
       button: {
@@ -175,16 +176,21 @@ const generatePostAcceptedEmail = (
     },
   };
 };
+
 const generatePostRejectedEmail = (
   username: string,
-  blogTitle: string
+  blogTitle: string,
+  reason: string
 ): EmailBodyContent => {
   return {
     body: {
       name: username,
       intro: `Hello ${username}, unfortunately, your blog post "${blogTitle}" has been rejected by our review team.`,
+      dictionary: {
+        reason: `Reason for rejection: ${reason}`,
+      },
       outro:
-        "You cannot update this post, but you’re welcome to write and submit a new blog for review. We appreciate your contribution!",
+        "You can update your blog to address the above issue(s) and resubmit it for review. We appreciate your contribution and look forward to your updated post!",
     },
   };
 };
