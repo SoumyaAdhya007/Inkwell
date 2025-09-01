@@ -6,11 +6,14 @@ import adminCheck from "../../middlewares/admin.middlewares";
 import apiKeyCheck from "../../middlewares/apiKey.middlewares";
 import {
   approvePostByIdValidator,
+  getPostReviewLogByPostIdValidator,
   rejectPostByIdValidator,
 } from "../validators/admin.validators";
 import {
   approvePostById,
   getAllPendingPosts,
+  getAllPostReviewLogs,
+  getPostReviewLogByPostId,
   rejectPostById,
 } from "../controllers/admin.controllers";
 
@@ -26,5 +29,14 @@ router
 router
   .route("/posts/:id/reject")
   .put(validateReq(rejectPostByIdValidator), rejectPostById);
+
+router.route("/posts/reviewlogs").get(getAllPostReviewLogs);
+
+router
+  .route("/posts/reviewlogs/:id")
+  .get(
+    validateReq(getPostReviewLogByPostIdValidator),
+    getPostReviewLogByPostId
+  );
 
 export default router;
