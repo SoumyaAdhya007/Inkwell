@@ -4,7 +4,21 @@ const approvePostByIdValidator = {
   params: z.object({
     id: z.string(),
   }),
+  body: z.object({
+    reason: z.string().min(1),
+  }),
 };
+
 const rejectPostByIdValidator = approvePostByIdValidator;
 
-export { approvePostByIdValidator, rejectPostByIdValidator };
+const getPostReviewLogByPostIdValidator = {
+  params: z.object({
+    id: z.string(),
+  }),
+};
+
+export {
+  approvePostByIdValidator,
+  rejectPostByIdValidator,
+  getPostReviewLogByPostIdValidator,
+};
