@@ -88,7 +88,7 @@ const updatePostById = asyncHandler(async (req: Request, res: Response) => {
     updateCondition = true;
   }
 
-  if (post.status === postStatusesEnum.Approved && !updateCondition) {
+  if (post.status !== postStatusesEnum.Pending && !updateCondition) {
     updateCondition = true;
   }
 
@@ -97,12 +97,14 @@ const updatePostById = asyncHandler(async (req: Request, res: Response) => {
     if (!findCategory) {
       throw new ApiError(400, "Please choose a valid category.");
     }
+
     await Post.findByIdAndUpdate(post._id, {
       title,
       content,
       category: findCategory._id,
       tags,
     });
+
     res.status(200).json(new ApiResponse(200, "Post updated successfully."));
   } else {
     throw new ApiError(400, "Post cannot be updated until approved by admin.");
