@@ -8,6 +8,14 @@ import { generatePostCreatedEmail, sendMail } from "../../utils/mail";
 import env from "../../config/env.config";
 import { postStatusesEnum, userRolesEnum } from "../../utils/constants";
 
+const slugify = (title: string) => {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "") // remove special chars
+    .replace(/\s+/g, "-") // replace spaces with -
+    .replace(/-+/g, "-"); // collapse multiple -
+};
 const createPost = asyncHandler(async (req: Request, res: Response) => {
   const { title, content, category, publicationDate, tags } = req.body;
   const user = req.user;
@@ -15,11 +23,21 @@ const createPost = asyncHandler(async (req: Request, res: Response) => {
   if (!findCategory) {
     throw new ApiError(400, "Please choose a valid category.");
   }
+  const slug = slugify(title);
+  // Regex to match: slug OR slug-<number>
+  const regex = new RegExp(`^${slug}(-\\d+)?$`, "i");
+
+  const existingSlugs = await Post.find({
+    slug: regex,
+  });
+
   const post = await Post.create({
     userId: user._id,
     title,
     content,
     category: findCategory._id,
+    slug:
+      existingSlugs.length === 0 ? slug : `${slug}-${existingSlugs.length + 1}`, // Use the slug if available; otherwise, append existingSlugs length + 1 to make it unique
     publicationDate,
     tags,
   });
@@ -135,6 +153,35 @@ const deletePostById = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
+const checkSlugAvailability = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { slug } = req.body;
+
+    const existingSlugs = await Post.find({ slug });
+
+    if (existingSlugs.length > 0) {
+      throw new ApiError(409, "Slug already exist.");
+    }
+
+    res.status(200).json(new ApiResponse(200, "Slug available."));
+  }
+);
+
+const updateSlugByPostId = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { slug } = req.body;
+
+  const existingSlugs = await Post.find({ slug });
+
+  if (existingSlugs.length > 0) {
+    throw new ApiError(409, "Slug already exist.");
+  }
+
+  await Post.findByIdAndUpdate(id, { slug: slugify(slug) });
+
+  res.status(200).json(new ApiResponse(200, "Slug updated successfully."));
+});
+
 export {
   createPost,
   getAllPosts,
@@ -142,4 +189,6 @@ export {
   getPostById,
   updatePostById,
   deletePostById,
+  checkSlugAvailability,
+  updateSlugByPostId,
 };
