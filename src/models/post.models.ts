@@ -6,6 +6,7 @@ interface IPost extends Document {
   title: string;
   content: string;
   category: mongoose.Schema.Types.ObjectId;
+  slug: string;
   publicationDate: Date;
   tags: [string];
   status: string;
@@ -20,6 +21,8 @@ const postSchema = new mongoose.Schema<IPost>(
     },
     title: {
       type: String,
+      minLength: 3,
+      maxLength: 50,
       require: true,
     },
     content: {
@@ -29,6 +32,11 @@ const postSchema = new mongoose.Schema<IPost>(
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
+      required: true,
+    },
+    slug: {
+      type: String,
+      unique: true,
       required: true,
     },
     publicationDate: {
