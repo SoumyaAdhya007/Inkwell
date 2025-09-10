@@ -43,7 +43,7 @@ const approvePostById = asyncHandler(async (req: Request, res: Response) => {
   const emailContent = generatePostAcceptedEmail(
     postUser.name,
     post.title,
-    `${env.CREATED_POST_EMAIL_URL}/${postUser._id}/${post._id}`
+    `${env.CREATED_POST_EMAIL_URL}/user/${postUser._id}/${post._id}`
   );
 
   const postReviewLog = await PostReviewLog.create({
