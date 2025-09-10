@@ -7,6 +7,7 @@ import ApiResponse from "../../utils/ApiResponse";
 import { generatePostCreatedEmail, sendMail } from "../../utils/mail";
 import env from "../../config/env.config";
 import { postStatusesEnum, userRolesEnum } from "../../utils/constants";
+import Comment from "../../models/comment.models";
 
 const slugify = (title: string) => {
   return title
@@ -16,6 +17,7 @@ const slugify = (title: string) => {
     .replace(/\s+/g, "-") // replace spaces with -
     .replace(/-+/g, "-"); // collapse multiple -
 };
+
 const createPost = asyncHandler(async (req: Request, res: Response) => {
   const { title, content, category, publicationDate, tags } = req.body;
   const user = req.user;
@@ -65,7 +67,9 @@ const createPost = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const getAllPosts = asyncHandler(async (req: Request, res: Response) => {
-  const posts = await Post.find({ status: postStatusesEnum.Approved });
+  const posts = await Post.find({ status: postStatusesEnum.Approved })
+    .populate({ path: "userId", select: "name" })
+    .sort({ updatedAt: -1 });
   res
     .status(200)
     .json(new ApiResponse(200, "Posts fetched successfully.", posts));
@@ -73,7 +77,11 @@ const getAllPosts = asyncHandler(async (req: Request, res: Response) => {
 
 const getUserPostById = asyncHandler(async (req: Request, res: Response) => {
   const { userId, id } = req.params;
-  const post = await Post.findOne({ _id: id, userId });
+  const post = await Post.findOne({ _id: id, userId }).populate({
+    path: "userId",
+    select: "name",
+  });
+
   if (!post) {
     throw new ApiError(404, "Post not found");
   }
@@ -182,6 +190,49 @@ const updateSlugByPostId = asyncHandler(async (req: Request, res: Response) => {
   res.status(200).json(new ApiResponse(200, "Slug updated successfully."));
 });
 
+const postComment = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = req.user;
+  const { comment } = req.body;
+
+  const post = await Post.findById(id);
+
+  if (!post) {
+    throw new ApiError(404, "Post not found.");
+  }
+
+  if (post.status !== postStatusesEnum.Approved) {
+    throw new ApiError(400, "Comments can only be added to approved posts.");
+  }
+  const newComment = await Comment.create({
+    userId: user._id,
+    postId: post._id,
+    comment,
+  });
+
+  res
+    .status(201)
+    .json(
+      new ApiResponse(
+        201,
+        "Comment added to the post successfully.",
+        newComment
+      )
+    );
+});
+
+const getPostComments = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const comments = await Comment.find({ postId: id })
+    .populate({ path: "userId", select: "name" })
+    .sort({ createdAt: -1 });
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, "Post comments fetched successfully.", comments)
+    );
+});
 export {
   createPost,
   getAllPosts,
@@ -191,4 +242,6 @@ export {
   deletePostById,
   checkSlugAvailability,
   updateSlugByPostId,
+  postComment,
+  getPostComments,
 };
