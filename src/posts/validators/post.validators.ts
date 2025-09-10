@@ -57,6 +57,15 @@ const updateSlugByPostIdValidator = {
   params: getPostByIdValidator.params.pick({ id: true }),
   body: checkSlugAvailabilityValidator.body.pick({ slug: true }),
 };
+const postCommentValidator = {
+  params: getPostByIdValidator.params.pick({ id: true }),
+  body: z.object({
+    comment: z.string().min(1),
+  }),
+};
+const getPostCommentsValidator = {
+  params: getPostByIdValidator.params.pick({ id: true }),
+};
 export {
   createPostValidator,
   getUserPostByIdValidator,
@@ -65,4 +74,6 @@ export {
   deletePostByIdValidator,
   checkSlugAvailabilityValidator,
   updateSlugByPostIdValidator,
+  postCommentValidator,
+  getPostCommentsValidator,
 };
