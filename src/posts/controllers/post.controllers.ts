@@ -46,7 +46,7 @@ const createPost = asyncHandler(async (req: Request, res: Response) => {
   const emailContent = generatePostCreatedEmail(
     user.name,
     post.title,
-    `${env.CREATED_POST_EMAIL_URL}/${user._id}/${post._id}`
+    `${env.CREATED_POST_EMAIL_URL}/user/${user._id}/${post._id}`
   );
 
   await sendMail(
